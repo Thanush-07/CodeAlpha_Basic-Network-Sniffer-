@@ -4,17 +4,17 @@ import sniffer
 
 app = Flask(__name__)
 
-# Start sniffing in background thread (set iface here)
-threading.Thread(target=sniffer.start_sniffing, args=("Wi-Fi",), daemon=True).start()
-
-
 @app.route("/")
 def index():
     return render_template("index.html")
 
 @app.route("/packets")
 def get_packets():
-    return jsonify(sniffer.packets[-20:])  # last 20 packets
+    return jsonify(sniffer.packets)
 
 if __name__ == "__main__":
+    # Start sniffer in background thread
+    t = threading.Thread(target=sniffer.start_sniffing, daemon=True)
+    t.start()
+
     app.run(debug=True)
