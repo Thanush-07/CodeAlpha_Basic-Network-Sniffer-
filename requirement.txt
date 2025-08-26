@@ -1,2 +1,5 @@
-flask
-scapy
+ Python 3.0
+ Flask
+ Scapy
+ Tailwind (via CDN, already included in templates)
+Npcap/WinPcap** (for Windows packet sniffing)
