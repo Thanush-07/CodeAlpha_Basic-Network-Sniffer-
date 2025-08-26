@@ -22,13 +22,18 @@ This project captures live network traffic, analyzes packet details, and display
 
 📂 Project Structure
 
+
 Basic-Network-Sniffer/
-│── app.py           # Flask backend
-│── sniffer.py       # Packet sniffing logic using scapy
+  # Flask backend
+
+│── sniffer.py       
+
 │── templates/
-│   ├── head.html    # Common head with Tailwind setup
-│   ├── index.html   # Main UI
-│── static/          # (Optional) custom JS/CSS
+
+│   ├── head.html    
+
+│   ├── index.html  
+
 │── requirements.txt # Dependencies
 
  ⚙️ Requirements
