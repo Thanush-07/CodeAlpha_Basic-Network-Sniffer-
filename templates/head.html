@@ -2,52 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Network Sniffer</title>
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    async function fetchPackets() {
-      try {
-        const res = await fetch('/packets');
-        const data = await res.json();
-        const container = document.getElementById("packet-data");
-        container.innerHTML = "";
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        data.forEach(pkt => {
-          container.innerHTML += `
-            <tr class="border-b hover:bg-gray-50">
-              <td class="px-4 py-2">${pkt.src || '-'}</td>
-              <td class="px-4 py-2">${pkt.dst || '-'}</td>
-              <td class="px-4 py-2 font-semibold text-blue-600">${pkt.proto || '-'}</td>
-              <td class="px-4 py-2 font-mono text-gray-600">${pkt.payload || '-'}</td>
-            </tr>`;
-        });
-      } catch (err) {
-        console.error("Error fetching packets:", err);
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Custom theme (neon colors) -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            neon: {
+              green: "#39FF14",
+              cyan: "#00FFFF",
+              purple: "#A020F0",
+            }
+          }
+        }
       }
     }
-
-    setInterval(fetchPackets, 2000); // Refresh every 2 sec
-    window.onload = fetchPackets;
   </script>
-</head>
-<body class="bg-gray-100 min-h-screen flex flex-col items-center p-6">
-  <h1 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-    🔍 Network Packet Sniffer
-  </h1>
 
-  <div class="w-full max-w-6xl bg-white shadow-md rounded-lg overflow-hidden">
-    <table class="w-full text-left border-collapse">
-      <thead>
-        <tr class="bg-blue-600 text-white">
-          <th class="px-4 py-3">Source IP</th>
-          <th class="px-4 py-3">Destination IP</th>
-          <th class="px-4 py-3">Protocol</th>
-          <th class="px-4 py-3">Payload (Preview)</th>
-        </tr>
-      </thead>
-      <tbody id="packet-data" class="bg-white"></tbody>
-    </table>
-  </div>
+  <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+  {% block content %}{% endblock %}
 </body>
 </html>
