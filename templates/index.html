@@ -1,65 +1,52 @@
-{% extends 'head.html' %}
+{% extends "head.html" %}
+
+{% block title %}Network Sniffer{% endblock %}
+
 {% block head %}
-{% endblock %}
-{% block body%}
+<script>
+    async function fetchPackets() {
+        try {
+            let res = await fetch("/packets");
+            let data = await res.json();
 
-    <div class="container mt-4">
-        <h2 class="text-center mb-4"><i class="fa-solid fa-network-wired"></i> Basic Network Sniffer</h2>
+            let table = document.getElementById("packetTable");
+            table.innerHTML = "";
 
-        <table id="packetTable" class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>Time</th>
-                    <th>Source IP</th>
-                    <th>Destination IP</th>
-                    <th>Protocol</th>
-                    <th>Length</th>
-                    <th>Info</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Dummy Data (will be replaced with live data) -->
-                <tr>
-                    <td>12:34:01</td>
-                    <td>192.168.1.5</td>
-                    <td>8.8.8.8</td>
-                    <td><span class="badge bg-warning text-dark protocol-badge">ICMP</span></td>
-                    <td>64</td>
-                    <td>Echo request</td>
-                </tr>
-                <tr>
-                    <td>12:34:02</td>
-                    <td>8.8.8.8</td>
-                    <td>192.168.1.5</td>
-                    <td><span class="badge bg-warning text-dark protocol-badge">ICMP</span></td>
-                    <td>64</td>
-                    <td>Echo reply</td>
-                </tr>
-                <tr>
-                    <td>12:34:03</td>
-                    <td>192.168.1.5</td>
-                    <td>192.168.1.1</td>
-                    <td><span class="badge bg-primary protocol-badge">TCP</span></td>
-                    <td>128</td>
-                    <td>HTTP GET</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-<a href="{{url_for('instruction')}}">instruction</a>
-    <!-- jQuery, Bootstrap JS, DataTables JS -->
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
-
-    <script>
-        $(document).ready(function() {
-            $('#packetTable').DataTable({
-                "pageLength": 10,
-                "order": [[0, "desc"]]
+            data.forEach(pkt => {
+                let row = `<tr class="hover:bg-gray-100 transition">
+                    <td class="px-6 py-4 text-sm">${pkt.src}</td>
+                    <td class="px-6 py-4 text-sm">${pkt.dst}</td>
+                    <td class="px-6 py-4 text-sm">${pkt.proto}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600 truncate max-w-xs">${pkt.payload}</td>
+                </tr>`;
+                table.innerHTML += row;
             });
-        });
-    </script>
+        } catch (e) {
+            console.error("Error fetching packets:", e);
+        }
+    }
+
+    // Refresh every 2 seconds
+    setInterval(fetchPackets, 2000);
+</script>
 {% endblock %}
 
+{% block content %}
+  <h1 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+    🔍 Network Packet Sniffer
+  </h1>
+
+  <div class="w-full max-w-6xl bg-white shadow-md rounded-lg overflow-hidden">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="bg-blue-600 text-white">
+          <th class="px-4 py-3">Source IP</th>
+          <th class="px-4 py-3">Destination IP</th>
+          <th class="px-4 py-3">Protocol</th>
+          <th class="px-4 py-3">Payload (Preview)</th>
+        </tr>
+      </thead>
+      <tbody id="packetTable" class="bg-white"></tbody>
+    </table>
+  </div>
+{% endblock %}
