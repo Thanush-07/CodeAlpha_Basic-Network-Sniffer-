@@ -1,28 +1,40 @@
-from scapy.all import sniff, IP, TCP, UDP, Raw, get_if_list
+from scapy.all import sniff, get_if_list
+import threading
+import json
 
 packets = []
 
-# Callback function when a packet is captured
-def packet_callback(pkt):
-    packet_data = {
-        "src": pkt[IP].src if IP in pkt else None,
-        "dst": pkt[IP].dst if IP in pkt else None,
-        "proto": pkt.proto if IP in pkt else None,
-        "payload": str(bytes(pkt[Raw])[:20]) if Raw in pkt else None
-    }
-    packets.append(packet_data)
+def packet_callback(packet):
+    try:
+        src = packet[0][1].src if hasattr(packet[0][1], "src") else "N/A"
+        dst = packet[0][1].dst if hasattr(packet[0][1], "dst") else "N/A"
+        proto = packet[0][1].name if hasattr(packet[0][1], "name") else "N/A"
+        payload = bytes(packet.payload)[:50].hex()  # small preview
+    except Exception as e:
+        src, dst, proto, payload = "N/A", "N/A", "N/A", str(e)
 
-    # Debug print (to confirm capture in terminal)
-    if IP in pkt:
-        print(f"[+] {pkt[IP].src} -> {pkt[IP].dst} | Proto: {pkt.proto}")
+    packets.append({
+        "src": src,
+        "dst": dst,
+        "proto": proto,
+        "payload": payload
+    })
 
-# Function to list all available interfaces
-def list_interfaces():
-    print("Available interfaces on your system:")
-    for iface in get_if_list():
-        print(" -", iface)
+    # keep only last 50 packets
+    if len(packets) > 50:
+        packets.pop(0)
 
-# Start sniffing on a specific interface
-def start_sniffing(iface="Wi-Fi"):
+
+def get_default_iface():
+    """Pick the first non-loopback interface automatically"""
+    interfaces = get_if_list()
+    for iface in interfaces:
+        if not iface.startswith("lo"):  # skip loopback
+            return iface
+    return interfaces[0]  # fallback
+
+
+def start_sniffing():
+    iface = get_default_iface()
     print(f"[*] Starting packet capture on: {iface}")
     sniff(iface=iface, prn=packet_callback, store=0)
